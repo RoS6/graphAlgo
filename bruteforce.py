@@ -2,7 +2,7 @@ import numpy as np
 from numba import jit,autojit
 from itertools import combinations,permutations
 @jit()
-def check_validity(tuple):
+def check_validity(tuple,graph):
     pair11,pair1_1,pair_11,pair_1_1=False,False,False,False
     index = tuple[1]
     array = graph[index]#y
@@ -36,7 +36,7 @@ def flip(graph):
 
 def sum(x,y):
     return x+y
-@jit
+
 def permute_unique(nums):
     perms = [[]]
     for n in nums:
@@ -47,13 +47,15 @@ def permute_unique(nums):
                 # handle duplication
                 if i < len(perm) and perm[i] == n: break
         perms = new_perm
+    # print(len(perms))
+    # print(len(set([tuple(t) for t in perms])))
     return perms
 
 from functools import reduce
-@jit
 def permutationResult(num,i,sumofnumber):
     allnumbersinlist = [1]*(sumofnumber-i)+[-1]*i
     li = permute_unique(allnumbersinlist)
+    print('permute finished')
     # print(li[0])
     result = []
     for i in li:
@@ -62,7 +64,15 @@ def permutationResult(num,i,sumofnumber):
         upper[np.triu_indices(num,1)] = list(i)
         result.append(upper)
         # print(upper)
+    print('upper finished')
     return result
+def checkV(graph):
+    flip(graph)
+    for j in combinations(combinationList, 2):
+        if not check_validity(j,graph):
+            # valid = False
+            return False
+    return True
 for num in range(8,9):
     print(f"Checking n = {num}")
     valid = True
@@ -74,12 +84,11 @@ for num in range(8,9):
         graphList = permutationResult(num,i,sumofnumber)
         # for graph in
         # break
-        for graph in graphList:
-            flip(graph)
-            for j in combinations(combinationList, 2):
-                if not check_validity(j):
-                    valid = False
-                    break
+        # for graph in graphList:
+        #     flip(graph)
+        if not (True in map(checkV,graphList)):
+            valid = False
+
         if valid:
             print('graph')
             import sys
