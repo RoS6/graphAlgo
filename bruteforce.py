@@ -1,7 +1,8 @@
 import numpy as np
 from numba import jit,autojit
 from itertools import combinations,permutations
-
+from gc import collect
+@jit
 def check_validity(tuple,graph):
     pair11,pair1_1,pair_11,pair_1_1=False,False,False,False
     index = tuple[1]
@@ -11,12 +12,21 @@ def check_validity(tuple,graph):
     for j in range(num):
         if row[j]==1 and array[j]==1:
             pair11 = True
-        if row[j] ==1 and array[j] ==-1:
+        # if row[j] ==1 and (array[j] ==-1 or array[j ]==0):
+        #     pair1_1 = True
+        # if (row[j] ==-1 or row[j]==0) and array[j] ==1:
+        #     pair_11 = True
+        # if (row[j] ==-1 or row[j]==0) and (array[j]==-1 or array[j] ==0):
+        #     pair_1_1 = True
+        if row[j] ==1 and (array[j] ==-1):
             pair1_1 = True
-        if row[j] ==-1 and array[j] ==1:
+        if (row[j] ==-1) and array[j] ==1:
             pair_11 = True
-        if row[j] ==-1 and array[j]==-1:
+        if (row[j] ==-1) and (array[j]==-1):
             pair_1_1 = True
+        # if row[j] ==0 and array[j] ==1:
+        #     pair_11 = True
+        # if row[j] ==  and array [j] ==
 
     if  pair11 and pair1_1 and pair_11 and pair_1_1:
         return True
@@ -28,6 +38,7 @@ pair = {
     '-11':(-1,1),
     '-1-1':(-1,-1)
 }
+@jit
 def flip(graph):
     for i in range(len(graph)):
         for j in range(i):
@@ -35,21 +46,21 @@ def flip(graph):
 
 def sum(x,y):
     return x+y
+# @jit
+# def permute_unique(nums):
+#     perms = [[]]
+#     for n in nums:
+#         new_perm = []
+#         for perm in perms:
+#             for i in range(len(perm) + 1):
+#                 new_perm.append(perm[:i] + [n] + perm[i:])
+#                 # handle duplication
+#                 if i < len(perm) and perm[i] == n: break
+#         perms = new_perm
+#     # print(len(perms))
+#     # print(len(set([tuple(t) for t in perms])))
+#     return perms
 @jit
-def permute_unique(nums):
-    perms = [[]]
-    for n in nums:
-        new_perm = []
-        for perm in perms:
-            for i in range(len(perm) + 1):
-                new_perm.append(perm[:i] + [n] + perm[i:])
-                # handle duplication
-                if i < len(perm) and perm[i] == n: break
-        perms = new_perm
-    # print(len(perms))
-    # print(len(set([tuple(t) for t in perms])))
-    return perms
-
 def equivalence_permutations(x, o):
     """Create all unique permutations with `x` x'es and `o` o's."""
     total = x+o
@@ -60,6 +71,7 @@ def equivalence_permutations(x, o):
         yield lst
 
 from functools import reduce
+@jit
 def permutationResult(num,i,sumofnumber):
     # allnumbersinlist = [1]*(sumofnumber-i)+[-1]*i
     # li = permute_unique(allnumbersinlist)
@@ -94,18 +106,23 @@ def permutationResult(num,i,sumofnumber):
 #             # valid = False
 #             return False
 #     return True
-
+@jit
 def checkV2(i):
     # flip(graph)
     upper = np.zeros((num, num))
     upper[np.triu_indices(num, 1)] = list(i)
     # graph = upper
     flip(upper)
-    print(upper)
+    # print(upper)
     for j in combinations(combinationList, 2):
         if not check_validity(j, upper):
                 # valid = False
+            del upper
+            print('del ')
+            collect()
             return False
+
+        # collect()
     return True
         # upper = np.zeros((num,num))
         # upper[np.triu_indices(num,1)] = list(i)
@@ -117,7 +134,7 @@ for num in range(9,10):
     result = False
     sumofnumber = reduce(sum,range(1,num))
     combinationList = [i for i in range(num)]
-    for i in range(17,sumofnumber+1):
+    for i in range(17,sumofnumber-7):
         print(f"i = {i} / {sumofnumber}")
         # np.zeros(num*num)
         result = permutationResult(num,i,sumofnumber)
