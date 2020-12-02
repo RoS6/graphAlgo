@@ -59,7 +59,7 @@ def checkValidity(indexX,indexY):
                     searchForbidden(indexX,indexY)
                     searchForbidden(indexY,indexX)
     else:
-        combinations = connected[rowx[indexY]]
+        combinations = connected[rowx[indexY].colour]
     fail = checkFailedCombination(rowx, rowy, combinations)
     if combinations == []:
         import sys
@@ -67,7 +67,7 @@ def checkValidity(indexX,indexY):
     for combi in fail:
         for col in range(num):
             # if rowx[col].colour == combi[0] and rowy[col].colour == 'u' and rowy[col].not_colour != combi[1]:
-            if rowx[col] == 0 or rowx[col].colour == 'n':
+            if rowx[col] == 0 or rowx[col].colour == 'n' or rowy[col] ==0 or rowy[col] =='n':
                 continue
             if rowx[col].colour == combi[0] and rowy[col].colour == 'u' and combi[1] not in rowy[col].not_colour:
                 rowy[col].colour = combi[1]
@@ -75,12 +75,14 @@ def checkValidity(indexX,indexY):
                 searchForbidden(indexY,col)
                 searchForbidden(col,indexY)
                 fail.remove(combi)
+                break
             elif rowy[col].colour == combi[1] and rowx[col].colour == 'u' and combi[0] not in rowx[col].not_colour:
                 rowx[col].colour = combi[0]
                 graph[col][indexX].colour = combi[0]
                 searchForbidden(indexX,col)
                 searchForbidden(col,indexX)
                 fail.remove(combi)
+                break
             elif rowx[col].colour == 'u' and rowy[col].colour == 'u' and (combi[0] not in rowx[col].not_colour) and (combi[1] not in rowy[col].not_colour):
                 rowx[col].colour = combi[0]
                 rowy[col].colour = combi[1]
@@ -90,6 +92,7 @@ def checkValidity(indexX,indexY):
                 searchForbidden(indexY,col)
                 searchForbidden(col,indexX)
                 searchForbidden(col,indexY)
+                break
 
     if fail == []:
         return
@@ -101,10 +104,10 @@ def checkValidity(indexX,indexY):
             # print(num)
             i.append(Edge())
             new_row.append(Edge())
-        new_row.append(Edge())
+        new_row.append(0)
         graph.append(new_row)
         checkValidity(indexX,indexY)
-        print(num)
+        # print(num)
 
 
 firstLine = [Edge(),Edge('n'),Edge('r'),Edge(),Edge()]
@@ -132,4 +135,10 @@ while True:
         j = i+1
         while j<num:
             checkValidity(i,j)
+            j = j+1
 
+            print("j = "+str(j))
+        i = i+1
+        print('i = '+str(i))
+    print(graph)
+    break
